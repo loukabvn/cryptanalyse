@@ -1,0 +1,489 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="master_mobile.css">
+    <!-- font-awesome -->
+    <!-- ne fonctionne pas toujours -> <link rel="stylesheet" href="fonts/all.css"> -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
+    <script type="text/javascript" src="script_mobile.js"></script>
+    <title>Cryptanalyse</title>
+  </head>
+  <body id="body">
+    <div id="all">
+    <div id="toptriangle1"></div>
+    <div id="cuttriangle1"></div>
+    <div id="shape2"></div>
+
+    <!-- La page a propos -->
+    <div id ="apropos">
+      <h1>À propos</h1>
+      <p>
+        Ce site web a été réalisé dans le cadre d'un projet annuel de Licence 3 informatique
+        a l'UFR Sciences et Techniques de Rouen. Ce projet proposé par Madame Bardet, a commencé en Janvier 2021 et avait pour but de créer un site web d'initiation
+        a la cryptographie et plus précisément au chiffrement par substitution ainsi que de mettre en place ce projet sur un Raspberry PI 3 et sur le réseau de l'UFR de Rouen
+        sous le nom de domaine : "srv-dpi-proj-chiffrement-1.univ-rouen.fr".  Ce projet a été realisé par un groupe de 5 personnes :
+        Sami BABIGEON, Louka BOIVIN, Alexis OSMONT, Manon GUILLARD, Alan DURAND.<br><br><br><br>
+        Vous pouvez nous contacter sur nos adresses mail respectives : <br>
+        <br>
+        Sami BABIGEON : <br> sami.babigeon@univ-rouen.fr<br><br>
+        Louka BOIVIN : <br> louka.boivin@univ-rouen.fr<br><br>
+        Alexis OSMONT : <br> alexis.osmont@univ-rouen.fr<br><br>
+        Manon GUILLARD : <br> manon.guillard@univ-rouen.fr<br><br>
+        Alan DURAND : <br> alan.durand@univ-rouen.fr<br><br>
+      </p>
+    </div>
+
+    <!-- Le menu de navigation dans la page index : sans rien -->
+    <div id="menu-nav">
+      <div id="navigation-bar">
+        <ul>
+          <li><a href="#"><i class=""></i><span>Home</span></a></li>
+          <li id="last" onclick="info()"><a href="#"><i class="fa fa-bars fa-1x"></i></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Le menu de navigation dans les autres pages : avec les text area undo redo -->
+    <div id="menu-text">
+      <div id="text-bar">
+        <ul>
+          <p><a href="#" onclick="TransformMenu()">
+            <i class="fa fa-arrow-left fa-4x" style="color:#FF5583;"></i>
+          </a></p>
+          <li id = "bloc-cipher"><label for="cipher" id="chiff">Chiffré</label>
+            <textarea id="cipher" oninput="textChanged('cipher')" spellcheck="false">
+            Texte chiffré
+            </textarea>
+          </li>
+
+          <li id = "bloc-clear"><label for="clear">Clair</label>
+            <textarea id="clear" oninput="textChanged('clear')" spellcheck="false">
+            Texte clair
+            </textarea>
+          </li>
+
+          <li id = "bloc-replace">
+            <!-- Remplacement -->
+            Remplacer <input id="oldLetters" type="text"> par <input id="newLetters" type="text">
+            <button type="button" onclick="askReplacement(document.getElementById('oldLetters').value, document.getElementById('newLetters').value)" class="menu-btn"><span class="fa fa-share"></span></button>
+            <!-- Undo / Redo -->
+            <button id="undo" onclick="undo()" class="menu-btn" type="button"><span><i class='fa fa-undo fa-lg'></i></span></button>
+            <button id="clearAll" onclick="clearAll()" class="menu-btn" type="button"><span><i class="fa fa-trash" aria-hidden="true"></i></span></button>
+            <button id="redo" onclick="redo()" class="menu-btn" type="button"><span><i class='fa fa-redo fa-lg'></i></span></button>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+
+    <!-- page d'index presentation : input de textes chiffré ou non -->
+    <div id="banner">
+      <div class="app-text">
+        <h1>Cryptanalyse</h1>
+        <p> Bienvenue sur cryptanalyse. Sur ce site web vous pourrez trouver deux méthodes de chiffrement,
+          un chiffrement par substitution et un chiffrement par César. Ainsi que plusieurs
+            outils permettant d’attaquer des textes déjà chiffrés avec ces mêmes méthodes de chiffrement.
+        </p>
+      </div>
+
+      <div id="picture">
+        <img src="img/picture2.png"></img>
+      </div>
+
+      <div id=control-panel>
+        <h1>Tout commence ici</h1>
+        <p> Ci-dessous vous pouvez entrer un texte chiffré ou non. Si vous selectionnez non chiffré,
+          vous pourrez écrire un texte qu'on appelle clair. Un texte clair est un texte sans aucun
+          chiffrement, "bonjour" par exemple. Vous pourrez aussi, en sélectionnant chiffré,
+          écrire un texte deja chiffré et ensuite pouvoir selectionner la méthode de chiffrement
+          que vous avez utilisée pour écrire ce texte. <br><br>
+          Si vous n'êtes pas inspiré vous pouvez toujours cliquer sur "texte aléatoire" pour en générer un.
+      </p>
+
+        <!-- input de la page index -->
+        <ul>
+          <li class = "selection">
+            <table>
+                <tr>
+                  <td>
+                    <select name="slct" class="select-style" id="textType" onchange="showselect()" >
+                      <option selected disabled>Texte?</option>
+                      <option value="0">Chiffré</option>
+                      <option value="1">Non Chiffré</option></select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <select name="slct" class="select-style" id="CipherMethod" onchange="showselect()" >
+                      <option selected disabled>Chiffrement ?</option>
+                      <option value="0">Substitution</option>
+                      <option value="1">Cesar</option></select>
+                </tr>
+              </table>
+          </li>
+
+          <li><textarea id="TextInput" cols="21" rows="6" placeholder="Entrez votre texte ici" ></textarea></li>
+        </ul>
+
+        <ul class="bouttons">
+          <li>
+            <button disabled onclick="myFunction()" class="dropbtn" id ="talea">Texte aléatoire</button>
+            <div id="myDropdown" class="dropdown-content">
+              <button class="encrypt-btn" type="button" onclick="randomtextEasy()"><span>Simple</span></button>
+              <button class="encrypt-btn" type="button" onclick="randomtextHard()"><span>Particulier</span></button>
+            </div>
+          </li>
+
+          <li><button disabled class="encrypt-btn" type="button" id ="gob" onclick="TransformMenu()">
+            <span>Go</span></button>
+          </li>
+        </ul>
+
+        <div id ="warning">
+          <img src="img/warning.png"></img>
+          <p>Attention! Plus votre texte sera grand plus celui-ci pourra etre déchiffré correctement!</p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- page de dechiffrement de cesar -->
+    <div id = "clearDiv">
+      <div class="text-2">
+        <h1>Attaque par Force Brute</h1>
+        <p>L'attaque par force brute est une méthode utilisée en cryptanalyse pour trouver un mot de passe ou une clé.
+          Il s'agit de tester, une à une, toutes les combinaisons possibles.Cette méthode est en général considérée comme la plus simple concevable.
+          Elle permet de casser tout mot de passe en un temps fini indépendamment de la protection utilisée,
+          mais le temps augmente avec la longueur du mot de passe. <br>
+        </p>
+      </div>
+
+      <!-- déchiffrement cesar par mots force brute -->
+      <div class= "forceBrute">
+        <h1>Déchiffrement par force brute</h1>
+        <ul>
+          <li>
+            <p>Essayer de déchiffrer par vous-même en essayant différentes clés !</p>
+          </li>
+          <li><small><b>Clé de chiffrement :</b></small>
+            <select id="Key">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+            <option value="21">21</option>
+            <option value="22">22</option>
+            <option value="23">23</option>
+            <option value="24">24</option>
+            <option value="25">25</option>
+            <option value="Alea">Aleatoire</option>
+            </select>
+          <button class="encrypt-btn" type="button" onclick="decryptCesarInputWithKey()">
+            <span>Dechiffrement</span>
+          </button>
+          </li>
+
+          <li style="margin-top: 10%;">
+            <p>Vous pouvez également essayer les différentes clés automatiquement en cliquant
+                sur ce bouton : </p>
+            <button class="encrypt-btn" type="button" onclick="demonstrationForceBrute()" style="margin-left: 24%; margin-top: -2%;">
+              <span>Force Brute</span>
+            </button>
+          </li>
+          <li>
+            <textarea id="demonstration" cols="30" rows="5" wrap="hard" readonly="yes"></textarea>
+          </li>
+          <li>
+            <small><b>Clé de chiffrement :</b></small>
+            <textarea id="demonstrationKey" cols="3" rows="1" wrap="hard" readonly="yes"></textarea>
+          </li>
+
+          <li style="margin-top: 10%;">
+            <p>Ou vous pouvez déchiffer automatiquement
+            <button class="encrypt-btn" type="button" onclick="decryptAutomaticCesar()" style="margin-left: 11%;">
+              <span>Dechiffrement Automatique</span>
+            </button>
+            </p>
+          </li>
+          <li>
+            <small><b>Clé de chiffrement :</b></small>
+            <textarea id="keyAuto" cols="3" rows="1" wrap="hard" disabled></textarea>
+          </li>
+        </ul>
+      </div>
+
+      <!-- déchiffrement par analyse de frequence -->
+      <div class="text-3">
+        <h1>Attaque par fréquences</h1>
+        <p>L'analyse fréquentielle est basée sur le fait que dans chaque langue, certaines lettres
+          ou combinaisons de lettres apparaissent avec une certaine fréquence. Par exemple, en français, le e est la lettre la plus utilisée,
+          suivie du a et du s. Inversement, le w est peu utilisé. Par exemple si dans un texte crypté, la lettre la plus  utilisé est le 'j'
+          alors on peut supposer que c'est le 'e' du texte déchiffré. On calcule donc le décalage pour passer de 'e' à 'j',
+          qui sera donc de 5. Dans les petits textes, le 'e' n'est pas forcément le plus fréquent.</p>
+      </div>
+
+      <div class= "freq">
+        <h1>Déchiffrement par analyse fréquentielle</h1>
+        <li><p>Obtenez le graphique des fréquences.
+            <button  id="caesarDiagramBtn" class="encrypt-btn" type="button" onclick="showFreqDiagram('caesar', getFreqDiagramData(false))">
+            <span>Analyse Frequentielle</span></button>
+          	<button  id="caesarDiagramBtnSorted" class="encrypt-btn" type="button" onclick="showFreqDiagram('caesar', getFreqDiagramData(true))">
+            <span>Trier</span></button>
+            </p>
+        </li>
+
+        <div class="container-2">
+          <canvas id="caesarCanvas"></canvas>
+          <legend for="caesarCanvas"></legend>
+          <script type="text/javascript" src="script.js"></script>
+        </div>
+
+        <li>Selon vous, quelle lettre représente le 'e' dans le texte chiffré :
+          <textarea id="KeyFreq" cols="3" rows="1" wrap="hard" ></textarea>
+        </li>
+        <li>
+            <button class="encrypt-btn" type="button" onclick="decryptFreqCesar()">
+              <span>Déchiffrement par frequence</span>
+            </button>
+        </li>
+      </div>
+
+      <!-- déchiffrement par mots probables-->
+      <div class="text-4">
+        <h1>Attaque par mot probable</h1>
+        <p>L'attaque par mot probable est une technique de cryptanalyse qui consiste à supposer l'existence d'un mot probable dans le message chiffré.
+          Il est donc possible d'en déduire la clé du message si le mot choisi est correct.Ainsi on regarde dans le texte le premier mot de même longueur,
+          qui puisse être probablement le mot que nous lui donnons. Exemple: si on lui donne "le" , il va chercher le texte un mot de 2 lettres, si nous trouvons "rp" o,
+          calcule le decalage entre 'l' et 'r' qui est de 6,puis entre 'e' et 'p' qui est de 11. Le decalage n'est pas le même donc "ro" ne peut etre "le".
+          Contrairement a "tm" qui avec un decalage de 8 nous donne "le".
+        </p>
+      </div>
+
+      <div class= "probable">
+        <h1>Attaque par mot probable</h1>
+        <li> Donnez un mot probable :
+          <textarea id="motProbable" cols="10" rows="1" wrap="hard"></textarea>
+        </li>
+        <button class="encrypt-btn" type="button" onclick="probableCesar()">
+          <span>Déchiffrement par mot probable</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- page de dechiffrement d'un texte chiffré par substitution -->
+    <div id = "clearsubDiv">
+      <div class="text-2">
+        <h1>Attaque par force brute : ne fonctionne pas ici</h1>
+        <p>L'attaque par force brute est une méthode utilisée en cryptanalyse pour trouver un mot de passe ou une clé.
+          Il s'agit de tester, une à une, toutes les combinaisons possibles.Cette méthode est en général considérée comme la plus simple concevable.
+          Elle permet de casser tout mot de passe en un temps fini indépendamment de la protection utilisée,
+          mais le temps augmente avec la longueur du mot de passe. Dans le cas d'un chiffrement par substitution,
+          cette methode doit donc tester chaque combinaison de lettres car contrairement au chiffrement de césar,
+          trouver le décalage pour une lettre ne permet pas d'en déduire les autres.
+          On peut facilement calculer le nombre de combinaisons à essayer pour être certain trouver la bonne.
+          Pour la première lettre, disons 'a', il y a 26 possibilités (toutes les lettres de l'alphabet).
+          Pour ces 26 possibilités on va tester quelle lettre code le 'b' parmi les 25 restante, puis pour le 'c' parmi les 24 restantes etc...
+          Le nombre de combinaisons est donc égale à 26 x 25 x 24 ... x 1 = 26! = 4,03.10<sup>26</sup>.
+          Si l'on considère que tester une combinaison prends environ 1 ms (= 0.001 s), il faudrait quand même 1,28.10<sup>16</sup> années<br>
+          pour trouver la clé.
+        </p>
+      </div>
+
+      <div class="text-3">
+        <h1>Attaque par fréquences</h1>
+        <p>L'analyse fréquentielle est basée sur le fait que dans chaque langue, certaines lettres
+          ou combinaisons de lettres apparaissent avec une certaine fréquence. Par exemple, en français, le 'e' est la lettre la plus utilisée,
+          suivie du 'a' et du 's'. Inversement, le 'w' est peu utilisé. Par exemple si dans un texte crypté, la lettre la plus  utilisé est le 'j'
+          alors on peut supposer que c'est le 'e' du texte dechiffré. Il ne nous reste plus qu'a suposer que le 'e' est bien la lettre
+          la lettre la plus frequente puis le 'a' en deuxieme position et ainsi de suite en essayant de remplacer les lette du texte chiffré
+          par les lettres supposées par l'analyse fréquentielle</p>
+      </div>
+
+      <!-- déchiffrement par analyse fréquentiel-->
+      <div class= "freq">
+        <h1>Déchiffrement par analyse fréquentielle</h1>
+        <li><p>Obtenez le graphique des fréquences.
+            <button id="subDiagramBtn" class="encrypt-btn" type="button" onclick="showFreqDiagram('sub', getFreqDiagramData(false))">
+            <span>Analyse Frequentielle</span></button>
+          	<button id="subDiagramBtnSorted" class="encrypt-btn" type="button" onclick="showFreqDiagram('sub', getFreqDiagramData(true))">
+            <span id ="BigramTableh">Trier</span></button>
+            </p>
+        </li>
+
+        <div class="container-2">
+          <canvas id="subCanvas"></canvas>
+          <legend for="subCanvas"></legend>
+          <script type="text/javascript" src="script.js"></script>
+        </div>
+
+        <li>Nous allons essayer de déchiffrer le texte uniquement
+          grâce aux frequence d'apparition des lettres , d'après vous
+          quelle lettre représente le 'e' dans le texte chiffré :
+          <textarea id="KeyFreqSub" cols="3" rows="1" wrap="hard" ></textarea>
+        </li>
+        <li>
+            <button class="encrypt-btn" type="button" onclick="substFreqSimpleSolver()">
+              <span>Déchiffrement par frequence</span>
+            </button>
+        </li>
+        <li style="display:none;" id="freqtuto">Comme vous pouvez le voir en haut a droite le déchiffrement par frequence ne fonctionne pas,<br>
+          ou plutôt pas en totalité. En effet des statistiques montrent que la letter la plus presente dans<br>
+          la langue française est le 'e' puis le 'a', le 'i', le 's' .....<br><br>
+          Cependant ces statistiques ne sont pas toujours vrais, cela depend de la taille du texte et de sa composition.<br>
+          Essayez par vous même en utilisant la zone "remplacer _ par _" plus haut. Maintenant que vous connaissez les <br>
+          lettres le plus frequentes. Bonne chance!
+      </li>
+      </div>
+
+      <!-- déchiffrement par Recuit simulé -->
+      <div class="text-4">
+				<h1>Tables des Bigrammes et Algorithme de Recuit simulé</h1>
+        <p>
+						Une façon de représenter graphiquement l'information contenue dans l'analyse de fréquence d'un texte est la table des bigrames, en effet on peut facilement voir quel bigrame est le plus présent mais aussi par quoi est suivit telle ou telle lettre.
+            Ces tables caractérisent complétement une langue, le tableau du français n'est pas le même que celui de l'anglais) on peut attribuer une signature a chaque langue. De plus si un texte dans un alphabet A est chiffré dans un autre alphabet B,
+            chiffré revient à mélanger la table de A pour obtenir B et déchiffrer à remettre dans le même ordre en s'appuyant sur les fréquences.
+        </p>
+        <div id="BigramTable">
+          <button class="encrypt-btn" type="button" onclick="SubstDrawBigramTable()">
+            <span>Afficher les Tables des Bigrams</span>
+          </button>
+        </div>
+        <p>
+					L'algorithme de recuit simulé (inspiré d'un processus utilisé en métallurgie) est un algorithme d'optimisation pour trouver les extremas d'une fonction, il s'appuie sur le critère de Metropolis.
+					Le but de ces algorithmes est en général de trouver le minimum d'une fonction, pour cela on se place sur un point de la fonction et on regarde les voisins de notre point.
+					Si l'un de nos voisins est plus petit que nous on se déplace sur sa position et on recommence le processus ... Le problème en faisant ainsi est que l'on peut se retrouver dans
+					un "puit" c'est-à-dire un minimal local de la fonction. Pour assurer la convergence vers le minimum global on s'autorise de temps en temps (de manière aléatoire) a se déplacer vers
+					un voisin plus haut que le point actuel (pour remonter la pente).
+					Le recuit simulé utilise le même principe en ajoutant une variation : la température. Au début de l'algorithme la température est élevée, on s'autorise donc plus facilement
+					à explorer des possiblités moins intéressantes, a chaque itération on décroît la température pour se concentrer sur les bonnes solutions.
+        </p>
+				Lancer l'algorithme avec des paramètres par défaut :
+				<button class="encrypt-btn" type="button" onclick="Decrypt(100, 1000, score)">
+					<span>Déchiffrer</span>
+				</button>
+				<ul>
+					<li>
+						Lancer l'algorithme avec vos paramètres :<br>
+						<span>Température: </span><textarea id="SubstNbIter" cols="10" rows="1" wrap="hard" placeholder="100"></textarea>
+						<br>
+            <span>Itération: </span><textarea id="SubstTemperature" cols="10" rows="1" wrap="hard" placeholder="1000"></textarea>
+						<br>
+            <button class="encrypt-btn" type="button"
+							onclick="Decrypt(
+								parseInt(document.getElementById('SubstNbIter').value),
+								parseInt(document.getElementById('SubstTemperature').value),
+								score)">
+							<span>Déchiffrer</span>
+						</button>
+					</li>
+          <li>
+					  <button class="encrypt-btn" type="button" onclick="showSubstKey()"><span>Afficher la clé actuel</span></button>
+					</li>
+          <li>
+            <table id="alphabet-subst"></table>
+          </li>
+				</ul>
+
+      </div>
+
+		</div>
+
+    <!-- page de chiffrement d'un texte -->
+    <div id = "cipherDiv">
+
+      <!-- partie chiffrement cesar-->
+      <div class="cesar">
+        <h1>Chiffrement de cesar</h1>
+        <p>
+          En cryptographie, le chiffrement par décalage, aussi connu
+          comme le chiffre de César ou le code de César (voir les différents noms),
+          est une méthode de chiffrement très simple utilisée par Jules César
+          dans ses correspondances secrètes (ce qui explique le nom
+          « chiffre de César »).Le chiffre de César peut être cassé très facilement,
+          même à l'aide du seul texte chiffré.
+        </p>
+        <p>
+          Rentrez un decalage pour chiffrer votre texte.<br>
+          Soit :<br>
+          - un nombre.<br>
+          - une lettre, qui remplacera le 'a'.
+        </p>
+        <ul>
+          <li><small><b>DECALAGE</b></small></li>
+          <li><textarea id="input" cols="2" rows="1"></textarea></li>
+          <li><button class="encrypt-btn" type="button" onclick="cryptCaesarInput(document.getElementById('input').value)">
+            <span>Chiffrer</span>
+            </button></li>
+        </ul>
+      </div>
+
+      <!-- partie chiffrement substitution-->
+      <div class="substitution">
+        <h1>Chiffrement par substitution</h1>
+        <p>
+          Le chiffrement par substitution est une technique de chiffrement utilisée
+          depuis longtemps puisque le chiffre de César en est un cas particulier.
+          Sans autre précision, elle désigne en général un chiffrement par substitution,
+          qui consiste à substituer dans un message chacune des lettres de
+          l'alphabet par une autre (du même alphabet ou éventuellement d'un autre alphabet),
+          par exemple, ainsi que procédait César on peut remplacer a par t,
+          b par m et ainsi de suite.
+        </p>
+
+        <div>
+          <ul>
+            <div id="subst-space">
+              <span>Entrez un alphabet : a sera chiffré<br>par la 1<sup>ère</sup> de votre alphabet, b par la 2<sup>ème</sup> etc...<br>
+              (si vous n'êtes pas inspiré cliquez<br>directement sur le bouton)</span>
+            </div>
+          </ul>
+          <ul>
+            <li><textarea id="subst-alpha" cols="29" rows="1" wrap="hard" placeholder="bmnqeavkldxrhjoywgpctzsfui"></textarea>
+            <li><button class="encrypt-btn" type="button" onclick="cryptSubstInput()" style="margin-left: 30%;">
+              <span>Chiffrer</span>
+            </button></li>
+          </ul>
+          <ul>
+            <li><table id="mytable" value="">
+            </table></li>
+          </ul>
+          <ul>
+            <li>Vous pouvez maintenant essayer d'attaquer votre texte chiffré.</li>
+            <li><button class="encrypt-btn" type="button" onclick="goAttaque()"  href="#">
+              <span>Attaquer</a></span>
+            </button></li>
+            <li><table id="mytable2" value="">
+            </table></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div id="avertissement">
+      <div id="txt-avertissement">
+        <p>Attention ce site n'est visible qu'en mode portrait.</p>
+        <p>Veuillez tourner votre écran.</p>
+      </div>
+      <img id="rotate" src="img/giphy.gif"></img>
+    </div>
+  </body>
+</html>
